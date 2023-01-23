@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+project( image_to_ascii )
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+add_executable( image_to_ascii main.cpp )
+target_link_libraries( image_to_ascii ${OpenCV_LIBS} )
