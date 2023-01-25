@@ -8,7 +8,7 @@ int main() {
     // Ouvrir la webcam
     VideoCapture cap(0);
     if (!cap.isOpened()) {
-        cout << "Impossible d'ouvrir la webcam." << endl;
+        cout << "Problème avec la webcam" << endl;
         return -1;
     }
 
