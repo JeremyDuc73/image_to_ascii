@@ -4,51 +4,51 @@
 using namespace cv;
 using namespace std;
 
-int main() {
-    // Ouvrir la webcam
+int main()
+{
+    // Initialiser la webcam
     VideoCapture cap(0);
-    if (!cap.isOpened()) {
-        cout << "Impossible d'ouvrir la webcam." << endl;
+    if (!cap.isOpened())
+    {
+        cout << "Erreur lors de l'initialisation de la webcam" << endl;
         return -1;
     }
 
-    // Définir les caractères ASCII pour les différents niveaux de gris
-    char asciiChars[] = {'#', 'A', '@', '%', 'S', '+', '<', '*', ':', '.'};
+    // Définir les caractères ASCII à utiliser
+    string asciiChars = "@B%8WM#*oahkbdpwmZO0QlJUYxzcvnxrjft/\\|()1{}[]-_+~<>i!lI;:,";
 
-    while (true) {
-        // Capturer une image de la webcam
-        Mat image;
-        cap >> image;
+    while (true)
+    {
+        Mat frame;
+        cap >> frame; // Capturer une frame de la webcam
+
+        // Réduire la taille de l'image à 3x3 pixels pour chaque caractère
+        Mat smallFrame;
+        cv::resize(frame, smallFrame, cv::Size(), 1.0 / 2, 1.0 / 6, INTER_NEAREST);
 
         // Convertir l'image en niveaux de gris
-        cvtColor(image, image, COLOR_BGR2GRAY);
+        Mat grayFrame;
+        cvtColor(smallFrame, grayFrame, COLOR_BGR2GRAY);
 
-        int height = image.rows, width = image.cols;
+        // Boucle sur chaque pixel de l'image réduite
+        for (int y = 0; y < grayFrame.rows; y++)
+        {
+            for (int x = 0; x < grayFrame.cols; x++)
+            {
+                // Récupérer la luminosité du pixel (entre 0 et 255)
+                int pixelValue = grayFrame.at<uchar>(y, x);
 
-        // Boucler sur chaque groupe de pixels
-        for (int i = 0; i < height-2; i += 6) {
-            for (int j = 0; j < width-2; j += 2) {
-                // Récupérer le sous-rectangle de l'image pour le groupe de pixels en cours
-                Rect rect(j, i, 3, 3);
-                Mat group = image(rect);
+                // Calculer l'index du caractère ASCII correspondant (entre 0 et 19)
+                int asciiIndex = (pixelValue * asciiChars.size()) / 256;
 
-                // Calculer la moyenne des valeurs de gris pour le groupe de pixels
-                Scalar mean, stddev;
-                meanStdDev(group, mean, stddev);
-
-                // Utiliser la moyenne pour déterminer le caractère ASCII correspondant
-                int meanValue = (int)mean.val[0];
-                int index = meanValue / 25;
-                cout << asciiChars[index];
+                // Afficher le caractère ASCII correspondant
+                cout << asciiChars[asciiIndex];
             }
             cout << endl;
         }
 
-        // Afficher l'image en ASCII
-        cout << endl;
-
-        // Attendre pour le prochain cadre
-        waitKey(60);
+        // Attendre une touche pour quitter
+        if (waitKey(30) >= 0) break;
     }
 
     return 0;
